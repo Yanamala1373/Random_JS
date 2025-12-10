@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🎁 Friend Matcher</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(to right, #74ebd5, #ACB6E5);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .container {
+            margin-top: 80px;
+            max-width: 400px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .btn-reset {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-reset:hover {
+            background-color: #a71d2a;
+        }
+        .message-box {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        @media (max-width: 576px) {
+            .container {
+                margin-top: 40px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <h2 class="mb-4">🎁 Friend Matcher</h2>
+        <form id="matchForm">
+            <div class="mb-3">
+                <input type="text" id="name" class="form-control" placeholder="Enter your name" required>
+            </div>
+            <button type="submit" class="btn btn-custom w-100 mb-2">Get Friend</button>
+        </form>
+        <button id="resetBtn" class="btn btn-reset w-100">🔄 Reset Matching</button>
+        <div id="result" class="message-box"></div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Matching Logic -->
+    <script>
+        const people = ["Alice", "Bob", "Charlie"];
+        let friendMap = {};
+        let drawnPeople = new Set();
+
+        function generateDerangement() {
+            let shuffled = [...people];
+            let valid = false;
+            while (!valid) {
+                shuffled.sort(() => Math.random() - 0.5);
+                valid = people.every((p, i) => p.toLowerCase() !== shuffled[i].toLowerCase());
+            }
+            friendMap = {};
+            people.forEach((p, i) => friendMap[p] = shuffled[i]);
+        }
+
+        function resetMatching() {
+            drawnPeople.clear();
+            generateDerangement();
+            document.getElementById("result").innerText = "Matching has been reset!";
+        }
+
+        generateDerangement();
+
+        document.getElementById("matchForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById("name").value.trim();
+            const normalizedName = people.find(p => p.toLowerCase() === nameInput.toLowerCase());
+
+            let message;
+            if (!normalizedName) {
+                message = "Name not found in the group!";
+            } else if (drawnPeople.has(normalizedName)) {
+                message = "Already Drawn";
+            } else {
+                const friend = friendMap[normalizedName];
+                drawnPeople.add(normalizedName);
+                message = `${normalizedName} is matched with ${friend}!`;
+            }
+
+            document.getElementById("result").innerText = message;
+        });
+
+        document.getElementById("resetBtn").addEventListener("click", resetMatching);
+    </script>
+</body>
+</html>
